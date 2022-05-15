@@ -230,6 +230,24 @@ export class Block {
       await parentBlock.validate(peer);
     }
 
+    let coinbaseTx;
+    try {
+      coinbaseTx = await this.getCoinbase();
+    } catch (e) {}
+
+    if (coinbaseTx !== undefined) {
+      let height = await objectManager.getHeight(this.blockid, peer);
+
+      if (coinbaseTx.height !== height) {
+        logger.debug(
+          `Block ${this.blockid} coinbase tx has height ${coinbaseTx.height}, but its height should be ${height} instead.`
+        );
+        throw new Error(
+          `Block ${this.blockid} coinbase tx has height ${coinbaseTx.height}, but its height should be ${height} instead.`
+        );
+      }
+    }
+
     if (this.T !== TARGET) {
       throw new Error(
         `Block ${this.blockid} does not specify the fixed target ${TARGET}, but uses target ${this.T} instead.`
