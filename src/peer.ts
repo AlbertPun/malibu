@@ -19,6 +19,7 @@ import {
   GetObjectMessageType,
   ObjectMessageType,
   ErrorMessageType,
+  GetChainTipMessageType,
 } from "./message";
 import { peerManager } from "./peermanager";
 import { canonicalize } from "json-canonicalize";

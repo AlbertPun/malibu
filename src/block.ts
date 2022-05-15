@@ -248,6 +248,28 @@ export class Block {
       }
     }
 
+    if (this.previd !== null) {
+      let currentTime = Math.floor(new Date().getTime() / 1000);
+      let parentObject = await objectManager.retrieve(this.previd, peer);
+      if (!BlockObject.guard(parentObject)) {
+        throw new Error(
+          `Got parent of block ${this.blockid}, but it was not of BlockObject type; rejecting block.`
+        );
+      }
+      let parentBlock = Block.fromNetworkObject(parentObject);
+      logger.debug(
+        `current time is ${currentTime} and parent block created ${parentBlock.created}.`
+      );
+
+      if (
+        !(parentBlock.created < this.created && this.created <= currentTime)
+      ) {
+        throw new Error(
+          `Block ${this.blockid} has time ${this.created}, but is not in between ${parentBlock.created} and ${this.created}.`
+        );
+      }
+    }
+
     if (this.T !== TARGET) {
       throw new Error(
         `Block ${this.blockid} does not specify the fixed target ${TARGET}, but uses target ${this.T} instead.`
